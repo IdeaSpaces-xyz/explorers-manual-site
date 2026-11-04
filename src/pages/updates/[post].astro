@@ -1,0 +1,47 @@
+---
+import '../../styles/timeline.css';
+import Base from '../../layouts/Base.astro';
+import { front, opening, updates, updatesRoute, type Update } from '../../lib/content';
+import { shortDate } from '../../lib/dates';
+
+export function getStaticPaths() {
+  return updates.map((post) => ({ params: { post: post.slug }, props: { post } }));
+}
+
+const { post } = Astro.props as { post: Update };
+const parents = post.parents.filter((parent) => parent.id !== opening!.id);
+---
+
+<Base title={`${post.name} · ${front.name}`} description={post.summary} twin={post.twin}>
+  <article class="wrap reader t-post">
+    <p class="t-back"><a href={updatesRoute}>← {opening!.name}</a></p>
+    <p class="t-date">
+      <time datetime={post.date.toISOString()}>{shortDate(post.date)}</time>
+      {post.author && <span>{post.author}</span>}
+    </p>
+    <h1>{post.name}</h1>
+    {parents.map((parent) => <p class="c-follows">Follows <a href={parent.route}>{parent.name}</a></p>)}
+    <Fragment set:html={post.html} />
+    {
+      post.map.length > 0 && (
+        <div class="t-map">
+          <p class="t-map-label">What changed, read more here</p>
+          <ul>
+            {post.map.map((link) => (
+              <li>
+                <a href={link.href} rel={link.external ? 'noopener noreferrer' : undefined}>
+                  <span class="t-page">
+                    {link.name}
+                    {link.external && ' ↗'}
+                  </span>
+                  {link.summary && <span class="t-why">{link.summary}</span>}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )
+    }
+    {post.replies.map((reply) => <p class="c-follows">Followed by <a href={reply.route}>{reply.name}</a></p>)}
+  </article>
+</Base>

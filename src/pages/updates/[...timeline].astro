@@ -1,0 +1,44 @@
+---
+import '../../styles/timeline.css';
+import Base from '../../layouts/Base.astro';
+import LinePost from '../../components/LinePost.astro';
+import { front, opening, stories, updatesRoute } from '../../lib/content';
+import { shortDate } from '../../lib/dates';
+
+// No page at all when the pin has no updates Thread.
+export function getStaticPaths() {
+  return opening ? [{ params: { timeline: undefined } }] : [];
+}
+---
+
+<Base title={`${opening!.name} · ${front.name}`} description={opening!.summary} twin={`${updatesRoute}.md`}>
+  <section class="wrap t-head t-head-a">
+    <h1>{opening!.name}</h1>
+    <Fragment set:html={opening!.html} />
+    <p class="t-feeds"><a href="/rss.xml">RSS</a><a href={`${updatesRoute}.md`}>As Markdown</a></p>
+  </section>
+  <div class="wrap">
+    <ol class="a-line">
+      {
+        stories.map(({ post, followUps }, index) => (
+          <li class:list={['a-story', { 'a-newest': index === 0 }]}>
+            <LinePost post={post} heading="h2" />
+            {followUps.length > 0 && (
+              <ol class="a-branch" aria-label={`Follow-ups to ${post.name}`}>
+                {followUps.map((next) => (
+                  <li>
+                    <LinePost post={next} heading="h3" />
+                  </li>
+                ))}
+              </ol>
+            )}
+          </li>
+        ))
+      }
+      <li class="a-origin">
+        <p class="t-date"><time datetime={opening!.date.toISOString()}>{shortDate(opening!.date)}</time></p>
+        <p class="a-origin-text">The log begins</p>
+      </li>
+    </ol>
+  </div>
+</Base>

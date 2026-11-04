@@ -7,7 +7,8 @@ import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { dirname, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { PAGES, routeOf, twinOf, isNeverPublished } from '../src/lib/pages.mjs';
+import { PAGES, UPDATES_ROUTE, routeOf, twinOf, isNeverPublished } from '../src/lib/pages.mjs';
+import { loadUpdates } from '../src/lib/updates.mjs';
 
 const site = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const dist = join(site, 'dist');
@@ -37,6 +38,28 @@ for (const { path } of PAGES) {
   if (readFileSync(join(dist, twin), 'utf8') !== note) problems.push(`twin differs from the Note: ${twin}`);
 }
 
+const thread = loadUpdates(process.env.MANUAL_SOURCE ?? join(site, '.source'));
+const posts = thread ? thread.posts.filter((post) => post !== thread.opening) : [];
+if (thread) {
+  twins.add(`${UPDATES_ROUTE}.md`);
+  for (const required of [`${UPDATES_ROUTE}.html`, `${UPDATES_ROUTE}.md`, '/rss.xml']) {
+    if (!fileSet.has(required)) problems.push(`no ${required}`);
+  }
+  const feed = fileSet.has('/rss.xml') ? readFileSync(join(dist, 'rss.xml'), 'utf8') : '';
+  for (const post of posts) {
+    twins.add(post.twin);
+    if (!fileSet.has(`${post.route}.html`)) problems.push(`no page for ${post.file}`);
+    if (!fileSet.has(post.twin)) problems.push(`no twin for ${post.file}`);
+    else {
+      const note = execFileSync('git', ['-C', root, 'show', `${pin}:${post.file}`], { encoding: 'utf8' });
+      if (readFileSync(join(dist, post.twin), 'utf8') !== note) problems.push(`twin differs from the post: ${post.twin}`);
+    }
+    if (!feed.includes(post.id)) problems.push(`the feed does not carry ${post.file}`);
+  }
+} else if (fileSet.has('/rss.xml') || fileSet.has(`${UPDATES_ROUTE}.html`)) {
+  problems.push('a timeline with no updates Thread at the pin');
+}
+
 for (const file of files) {
   if (isNeverPublished(file)) problems.push(`never-published path in dist: ${file}`);
   if (file.endsWith('.md') && !twins.has(file)) problems.push(`unlisted Markdown in dist: ${file}`);
@@ -56,7 +79,8 @@ let links = 0;
 for (const page of pages) {
   const html = readFileSync(join(dist, page), 'utf8');
   for (const [, raw] of html.matchAll(/<(?:a|link|script|img)\b[^>]*?\s(?:href|src)="([^"]+)"/g)) {
-    const href = raw.replaceAll('&amp;', '&').replaceAll('&#38;', '&');
+    // A link to this site by its full address must land too: posts use them, so they survive in RSS.
+    const href = raw.replaceAll('&amp;', '&').replaceAll('&#38;', '&').replace(/^https:\/\/manual\.ideaspaces\.xyz(?=[/#]|$)/, '') || '/';
     if (/^[a-z][a-z0-9+.-]*:/i.test(href) || href.startsWith('//')) continue;
     links += 1;
     const [path, anchor] = href.split('#');
@@ -78,6 +102,9 @@ else {
   for (const { path } of PAGES) {
     if (!llms.includes(twinOf(path))) problems.push(`llms.txt does not list ${twinOf(path)}`);
   }
+  for (const post of posts) {
+    if (!llms.includes(post.twin)) problems.push(`llms.txt does not list ${post.twin}`);
+  }
 }
 if (!fileSet.has('/404.html')) problems.push('no 404 page');
 
@@ -86,4 +113,4 @@ if (problems.length > 0) {
   for (const problem of problems) console.error(`  ${problem}`);
   process.exit(1);
 }
-console.log(`dist/ holds: ${PAGES.length} pages, ${twins.size} Markdown files, ${links} internal links all landing, manual ${pin.slice(0, 7)}`);
+console.log(`dist/ holds: ${PAGES.length} pages, ${posts.length} updates, ${twins.size} Markdown files, ${links} internal links all landing, manual ${pin.slice(0, 7)}`);

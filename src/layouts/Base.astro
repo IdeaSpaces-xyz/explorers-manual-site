@@ -2,7 +2,7 @@
 import '../styles/tokens.css';
 import '../styles/site.css';
 import logo from '../components/logo-symbol.svg?raw';
-import { COMMIT, front, nav } from '../lib/content';
+import { COMMIT, front, hasUpdates, nav, opening, updatesRoute } from '../lib/content';
 
 interface Props {
   title: string;
@@ -27,6 +27,7 @@ const canonical = new URL(path, Astro.site).href;
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
     {twin && <link rel="alternate" type="text/markdown" href={twin} />}
+    {hasUpdates && <link rel="alternate" type="application/rss+xml" title={opening!.name} href="/rss.xml" />}
     <link rel="sitemap" href="/sitemap-index.xml" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <meta property="og:type" content="website" />
@@ -67,6 +68,7 @@ const canonical = new URL(path, Astro.site).href;
               </a>
             ))
           }
+          {hasUpdates && <a href={updatesRoute} aria-current={path.startsWith(updatesRoute) ? 'page' : undefined}>Updates</a>}
         </nav>
       </div>
     </header>
@@ -78,6 +80,8 @@ const canonical = new URL(path, Astro.site).href;
         <nav aria-label="Footer">
           <a href="/">Manual</a>
           {nav.map((page) => <a href={page.route}>{page.nav}</a>)}
+          {hasUpdates && <a href={updatesRoute}>Updates</a>}
+          {hasUpdates && <a href="/rss.xml">RSS</a>}
           {twin && <a href={twin}>This page as Markdown</a>}
           <a href="/llms.txt">llms.txt</a>
           <a href="https://ideaspaces.xyz">ideaspaces.xyz ↗</a>

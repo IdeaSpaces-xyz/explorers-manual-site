@@ -29,7 +29,8 @@ UI/UX holds this repo.
    the Notes allowed from it. `scripts/build.mjs` reads those files from Git at the pin, so an uncommitted
    edit or an unlisted file cannot reach the site. Moving the pin is a reviewed commit here.
 3. **Never published, for now:** `_agent/`, `.pi/`, `_threads/`, `_local/`. The build refuses them
-   twice: in the allow-list, and in the finished `dist/`.
+   twice: in the allow-list, and in the finished `dist/`. The one exception is the posts of the manual's
+   updates Thread, named in `src/lib/pages.mjs`; its `_agent/` and every other Thread stay closed.
 4. **The build refuses rather than guesses.** A missing Note, a dead internal link or anchor, or a How
    it works beat that does not match its scene stops the build.
 5. **Text reads without JavaScript.** Scripts only add to a page that already works: the animation,
