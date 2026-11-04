@@ -1,0 +1,39 @@
+---
+import Base from '../../layouts/Base.astro';
+import { front, opening, updates, updatesRoute, type Update } from '../../lib/content';
+import { longDate } from '../../lib/dates';
+
+// A plain timeline until the human picks a direction from Visuals. No page at all
+// when the pin has no updates Thread.
+export function getStaticPaths() {
+  return opening ? [{ params: { timeline: undefined } }] : [];
+}
+
+const follows = (post: Update) => post.parents.filter((parent) => parent.id !== opening!.id);
+---
+
+<Base title={`${opening!.name} · ${front.name}`} description={opening!.summary} twin={`${updatesRoute}.md`}>
+  <article class="wrap reader">
+    <h1>{opening!.name}</h1>
+    <Fragment set:html={opening!.html} />
+    <p class="feeds"><a href="/rss.xml">RSS</a> · <a href={`${updatesRoute}.md`}>Markdown</a></p>
+    <ol class="timeline">
+      {
+        updates.map((post) => (
+          <li>
+            <time datetime={post.date.toISOString()}>{longDate(post.date)}</time>
+            <h2>
+              <a href={post.route}>{post.name}</a>
+            </h2>
+            <p>{post.summary}</p>
+            {follows(post).map((parent) => (
+              <p class="follows">
+                Follows <a href={parent.route}>{parent.name}</a>
+              </p>
+            ))}
+          </li>
+        ))
+      }
+    </ol>
+  </article>
+</Base>

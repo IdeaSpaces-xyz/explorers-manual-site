@@ -1,0 +1,42 @@
+---
+import Base from '../../layouts/Base.astro';
+import { front, opening, updates, updatesRoute, type Update } from '../../lib/content';
+import { longDate } from '../../lib/dates';
+
+export function getStaticPaths() {
+  return updates.map((post) => ({ params: { post: post.slug }, props: { post } }));
+}
+
+const { post } = Astro.props as { post: Update };
+const parents = post.parents.filter((parent) => parent.id !== opening!.id);
+---
+
+<Base title={`${post.name} · ${front.name}`} description={post.summary} twin={post.twin}>
+  <article class="wrap reader update">
+    <p class="update-meta">
+      <time datetime={post.date.toISOString()}>{longDate(post.date)}</time>{post.author && ` · ${post.author}`}
+    </p>
+    <h1>{post.name}</h1>
+    <Fragment set:html={post.html} />
+    {
+      post.map.length > 0 && (
+        <section class="changed" aria-labelledby="changed">
+          <h2 id="changed">What changed, read more here</h2>
+          <ul>
+            {post.map.map((link) => (
+              <li>
+                <a href={link.href}>{link.name}</a>
+                {link.summary && <span>{link.summary}</span>}
+              </li>
+            ))}
+          </ul>
+        </section>
+      )
+    }
+    {parents.map((parent) => <p class="follows">Follows <a href={parent.route}>{parent.name}</a></p>)}
+    {post.replies.map((reply) => <p class="follows">Followed by <a href={reply.route}>{reply.name}</a></p>)}
+  </article>
+  <nav class="wrap page-end" aria-label="Where next">
+    <a href={updatesRoute}>← {opening!.name}</a>
+  </nav>
+</Base>

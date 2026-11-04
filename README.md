@@ -39,6 +39,14 @@ To publish a new manual commit, change `manual.pin` and rebuild. To publish anot
 `/explore/notes` is the page and `/explore/notes.md` its twin: the Note exactly as it stands at the
 pin. `/llms.txt` lists them all.
 
+## The timeline
+
+`/updates` is the manual's updates Thread, `_threads/updates/`, read from Git at the pin. Only `kind: post`
+reaches readers, and `src/lib/updates.mjs` builds the tree from `in_reply_to`. Each post has a page, a `.md`
+twin and a place in `/rss.xml`; `/updates.md` and `llms.txt` list them with dates, so an agent can answer
+"what changed since this date?". A pin without the Thread simply has no timeline. The look is plain until
+a direction is chosen.
+
 ## How it works' story
 
 The Note marks the story with comments, so its wording stays plain Markdown:

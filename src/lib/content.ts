@@ -2,8 +2,10 @@ import fs from 'node:fs';
 import path from 'node:path';
 import matter from 'gray-matter';
 import { Marked, type Tokens } from 'marked';
-import { FRONT, PAGES, routeOf, twinOf } from './pages.mjs';
+import { FRONT, OLD_ANCHORS, PAGES, UPDATES_ROUTE, routeOf, twinOf } from './pages.mjs';
 import { BEATS } from './story.mjs';
+import { loadUpdates } from './updates.mjs';
+import type { UpdatePost } from './updates.mjs';
 
 const SOURCE = process.env.MANUAL_SOURCE;
 export const COMMIT = process.env.MANUAL_COMMIT ?? '';
@@ -53,7 +55,7 @@ export interface Page {
   story: Story | null;
 }
 
-const BY_PATH = new Map(PAGES.map((page) => [page.path, page]));
+const BY_PATH = new Map<string, (typeof PAGES)[number]>(PAGES.map((page) => [page.path, page]));
 const escapeHtml = (text: string) =>
   text.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;');
 
@@ -100,7 +102,10 @@ function renderer(from: string, slug: (text: string) => string) {
     renderer: {
       heading({ tokens, depth }) {
         const text = plainText(tokens as Tokens.Generic[]);
-        return `<h${depth} id="${slug(text)}">${this.parser.parseInline(tokens)}</h${depth}>\n`;
+        const id = slug(text);
+        const old = (OLD_ANCHORS as Record<string, Record<string, string[]>>)[from]?.[id] ?? [];
+        const aliases = old.map((alias) => `<span id="${alias}"></span>`).join('');
+        return `${aliases}<h${depth} id="${id}">${this.parser.parseInline(tokens)}</h${depth}>\n`;
       },
       // Comments carry marks for the build. Nothing else in a Note is raw HTML today.
       html({ text }) {
@@ -248,3 +253,49 @@ export function nextOnPath(page: Page): Page | null {
   if (index < 0 || index === order.length - 1) return null;
   return pages.find((candidate) => candidate.path === order[index + 1]) ?? null;
 }
+
+export interface MapLink {
+  href: string;
+  name: string;
+  summary: string;
+}
+
+export interface Update extends Omit<UpdatePost, 'map' | 'parents'> {
+  html: string;
+  map: MapLink[];
+  parents: UpdatePost[];
+  replies: UpdatePost[];
+}
+
+const SITE = 'https://manual.ideaspaces.xyz';
+
+/** A post's Map, as links: a manual page by its route, anything else by its address. */
+function mapLinks(post: UpdatePost): MapLink[] {
+  return post.map.map((member) => {
+    if ('address' in member) return { href: member.address, name: member.name, summary: member.summary };
+    const page = pages.find((candidate) => candidate.path === member.position);
+    if (!page) throw new Error(`${post.file}: its Map names ${member.position}, which is not published`);
+    return { href: `${SITE}${page.route === '/' ? '' : page.route}`, name: page.name, summary: member.summary };
+  });
+}
+
+const thread = loadUpdates(SOURCE);
+export const updatesRoute = UPDATES_ROUTE;
+export const hasUpdates = thread !== null;
+
+function toUpdate(post: UpdatePost): Update {
+  const render = renderer(post.file, makeSlugger());
+  return {
+    ...post,
+    html: render(post.body),
+    map: mapLinks(post),
+    parents: post.parents.map((id) => thread!.byId.get(id)!),
+    replies: thread!.posts.filter((candidate) => candidate.parents.includes(post.id)),
+  };
+}
+
+export const opening = thread ? toUpdate(thread.opening) : null;
+/** Newest first, the opening kept apart: it says what the Thread is, not what changed. */
+export const updates: Update[] = thread
+  ? thread.posts.filter((post) => post !== thread.opening).map(toUpdate).reverse()
+  : [];

@@ -1,5 +1,5 @@
 import type { APIRoute } from 'astro';
-import { COMMIT, front, inGroup, type Page } from '../lib/content';
+import { COMMIT, front, inGroup, opening, updates, updatesRoute, type Page } from '../lib/content';
 
 const SITE = 'https://manual.ideaspaces.xyz';
 const entry = (page: Page) => `- [${page.name}](${SITE}${page.twin}): ${page.summary}`;
@@ -7,6 +7,17 @@ const section = (title: string, group: string) => {
   const pages = inGroup(group);
   return pages.length > 0 ? [`## ${title}`, '', ...pages.map(entry), ''] : [];
 };
+
+const timeline = opening
+  ? [
+      '## Updates',
+      '',
+      `What changed, newest first. Feed: ${SITE}/rss.xml. As Markdown: ${SITE}${updatesRoute}.md`,
+      '',
+      ...updates.map((post) => `- ${post.date.toISOString().slice(0, 10)} [${post.name}](${SITE}${post.twin}): ${post.summary}`),
+      '',
+    ]
+  : [];
 
 export const GET: APIRoute = () =>
   new Response(
@@ -22,6 +33,7 @@ export const GET: APIRoute = () =>
       entry(front),
       ...inGroup('page').map(entry),
       '',
+      ...timeline,
       ...section('Guides', 'guides'),
       ...section('Explore', 'explore'),
       ...section('Reference', 'reference'),

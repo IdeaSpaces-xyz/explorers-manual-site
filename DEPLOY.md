@@ -52,11 +52,12 @@ Read-only probes, if authorized: `dig manual.ideaspaces.xyz`, `curl -I https://m
 base=https://manual.ideaspaces.xyz
 for path in / /index.md /README.md /how-it-works /how-it-works.md /integrations /developers \
   /guides/prepare-your-machine /guides/prepare-your-machine.md /explore/notes /reference/language \
-  /llms.txt /robots.txt /sitemap-index.xml /favicon.svg; do
+  /updates /updates.md /rss.xml /llms.txt /robots.txt /sitemap-index.xml /favicon.svg; do
   curl -sS -o /dev/null -w '%{http_code} %{content_type} %{url_effective}\n' "$base$path"
 done
 curl -sS -o /dev/null -w '%{http_code} %{url_effective}\n' "$base/_agent/agreement.md"   # 404
 curl -sS -o /dev/null -w '%{http_code} %{url_effective}\n' "$base/CLAUDE.md"             # 404
+curl -sS -o /dev/null -w '%{http_code} %{url_effective}\n' "$base/updates/README.md"     # 404
 curl -sSI "$base/" | grep -i 'content-signal\|content-type'
 ```
 

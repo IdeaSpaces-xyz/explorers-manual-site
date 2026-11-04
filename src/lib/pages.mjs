@@ -38,8 +38,22 @@ export const PAGES = [
   { path: 'reference/language.md', group: 'reference' },
 ];
 
+// The one Thread that is public: its posts, read from Git at the pin. Only the
+// files directly in this folder: its README and _agent/ stay closed, and so does
+// every other Thread. If the pin has no such Thread, the site has no timeline.
+export const UPDATES_THREAD = '_threads/updates';
+export const UPDATES_ROUTE = '/updates';
+export const MANUAL_ROOT_ID = 'n_ba793faed9389f32f7f59828';
+
 // Refused twice: here at build start, and again in the finished dist/.
 export const NEVER_PUBLISHED = ['_agent', '.pi', '_threads', '_local'];
+
+// Sections that kept their words but changed their address when the landing's
+// pages became Notes. An old link such as /integrations#claude must still land.
+export const OLD_ANCHORS = {
+  'integrations.md': { 'claude-code--cowork': ['claude'], watch: ['first-agent-video'] },
+  'developers.md': { 'published-foundation': ['protocol'], 'the-compatibility-boundary': ['build'] },
+};
 
 export function routeOf(path) {
   return path === FRONT ? '/' : `/${path.replace(/\.md$/, '')}`;

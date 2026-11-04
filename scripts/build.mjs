@@ -14,7 +14,7 @@ import { execFileSync, spawnSync } from 'node:child_process';
 import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { FRONT, PAGES, isNeverPublished } from '../src/lib/pages.mjs';
+import { FRONT, PAGES, UPDATES_THREAD, isNeverPublished } from '../src/lib/pages.mjs';
 
 const site = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const fail = (message) => {
@@ -56,6 +56,19 @@ for (const { path } of PAGES) {
   mkdirSync(dirname(join(source, path)), { recursive: true });
   writeFileSync(join(source, path), text);
 }
+
+// The updates Thread: the Markdown files directly in its folder, by name from Git.
+// Which of them readers see is decided in src/lib/updates.mjs, from frontmatter.
+const threadFiles = git('ls-tree', pin, `${UPDATES_THREAD}/`)
+  .split('\n')
+  .filter((line) => line.split(/\s+/)[1] === 'blob')
+  .map((line) => line.split('\t')[1])
+  .filter((path) => path.endsWith('.md') && !path.endsWith('/README.md'));
+for (const path of threadFiles) {
+  mkdirSync(dirname(join(source, path)), { recursive: true });
+  writeFileSync(join(source, path), git('show', `${pin}:${path}`));
+}
+console.log(threadFiles.length > 0 ? `Updates Thread: ${threadFiles.length} files` : 'No updates Thread at this pin: no timeline, no feed');
 
 const env = {
   ...process.env,

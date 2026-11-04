@@ -580,6 +580,92 @@ figure.code code {
   font-size: 28px;
 }
 
+/* The updates Thread, plainly, until a direction is chosen. */
+
+.reader p.feeds {
+  color: var(--is-text-secondary);
+  font-family: var(--font-chrome);
+  font-size: 13px;
+}
+
+.timeline {
+  margin: 48px 0 0;
+  padding: 0;
+  border-top: 1px solid var(--is-border);
+  list-style: none;
+}
+
+.timeline li {
+  margin: 0;
+  padding: 28px 0;
+  border-bottom: 1px solid var(--is-border);
+}
+
+.timeline time,
+.update-meta {
+  color: var(--is-text-secondary);
+  font-family: var(--font-chrome);
+  font-size: 12px;
+  letter-spacing: 0.01em;
+}
+
+.reader p.update-meta {
+  margin: 0 0 16px;
+  font-size: 12px;
+}
+
+.reader .timeline h2 {
+  margin-top: 2px;
+  font-size: 28px;
+  line-height: 1.15;
+}
+
+.timeline h2 a {
+  display: inline-block;
+  padding: 7px 0;
+  color: var(--is-text);
+  text-decoration: none;
+}
+
+.timeline h2 a:hover {
+  text-decoration: underline;
+}
+
+.timeline p {
+  margin-top: 10px;
+}
+
+.reader p.follows {
+  margin-top: 12px;
+  font-size: 17px;
+}
+
+.changed {
+  margin-top: 56px;
+  padding-top: 8px;
+  border-top: 1px solid var(--is-border);
+}
+
+.reader .changed h2 {
+  margin-top: 24px;
+  font-size: 26px;
+}
+
+.changed ul {
+  padding: 0;
+  list-style: none;
+}
+
+.reader .changed li {
+  margin-top: 14px;
+}
+
+.changed li span {
+  display: block;
+  color: var(--is-text-secondary);
+  font-size: 18px;
+}
+
 /* The end of a page: where the person goes next. */
 
 .page-end {
