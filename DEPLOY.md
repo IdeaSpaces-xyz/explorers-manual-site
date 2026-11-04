@@ -1,12 +1,18 @@
 ---
 name: Explorers Manual site, release handoff
-summary: Not deployed. What is prepared, what the human decides, the steps to attach manual.ideaspaces.xyz, and the signed-out smoke test to run afterwards.
+summary: Live at manual.ideaspaces.xyz since 2026-11-04. How to release a new pin, what the human decides, and the signed-out smoke test to run afterwards.
 ---
 
-# Release handoff (not deployed)
+# Release handoff
 
-`wrangler.jsonc` serves `dist/` as Worker static assets, with no route, no custom domain and
-`workers_dev: false`, so `wrangler deploy` alone cannot claim a hostname. Astro's canonical host is
+**Live since 2026-11-04**, Worker `explorers-manual-site`, custom domain attached in `wrangler.jsonc`. A later
+release is steps "Before a release", `npx wrangler deploy`, then the smoke test. The gates below were the
+first release's; a new hostname is still the human's.
+
+After attaching a new hostname, a resolver that was asked first may cache "no such name" for up to half an
+hour. Check `dig <host> @1.1.1.1` before calling a deploy broken.
+
+`wrangler.jsonc` serves `dist/` as Worker static assets, with `workers_dev: false`. Astro's canonical host is
 `https://manual.ideaspaces.xyz`. No beacon or analytics is included.
 
 ## Before a release
@@ -22,9 +28,7 @@ Inspect `dist/`. The build refuses a commit that is not on the manual's `main`, 
 internal link or anchor, a How it works beat that differs from its scene, and anything from `_agent/`,
 `.pi/`, `_threads/` or `_local/`.
 
-## Human gates
-
-Nothing below has been run.
+## Human gates, as the first release ran them
 
 1. Say which `manual.pin` goes live, and whether the manual is pushed to its hosted repo first.
 2. In Cloudflare, identify the account and the `ideaspaces.xyz` zone. Inspect any existing `manual`
