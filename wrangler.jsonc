@@ -7,7 +7,7 @@
     "html_handling": "auto-trailing-slash",
     "not_found_handling": "404-page"
   },
-  // No routes and no workers.dev: `wrangler deploy` alone cannot claim a hostname.
-  // Attaching manual.ideaspaces.xyz is the human's step, in DEPLOY.md.
+  // Attached on the human's word, 2026-11-04.
+  "routes": [{ "pattern": "manual.ideaspaces.xyz", "custom_domain": true, "zone_name": "ideaspaces.xyz" }],
   "workers_dev": false
 }
