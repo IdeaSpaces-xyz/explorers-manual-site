@@ -1,0 +1,61 @@
+/*
+ * IdeaSpaces tokens, copied from the design system's colors_and_type.css, which
+ * mirrors client/packages/ui/src/tokens.css. The OS theme applies by default;
+ * .light or .dark on <html> forces one. Names and values stay identical: change
+ * them at the source first.
+ */
+
+:root {
+  --is-bg: #ffffff;
+  --is-surface: #ffffff;
+  --is-surface-alt: #f6f7f9;
+  --is-border: #e5e8ef;
+  --is-text: #12141a;
+  --is-text-secondary: #4b5262;
+  --is-text-tertiary: #7b8190;
+  --is-accent: #4a7898;
+  --is-accent-text: #385b75;
+  --is-focus-ring: #4a7898;
+  --is-purpose: #cb7758;
+  --ed-ink: #242321;
+
+  --font-prose: 'Sorts Mill Goudy', Georgia, 'Times New Roman', serif;
+  --font-chrome: 'Fragment Mono', ui-monospace, Menlo, monospace;
+
+  color-scheme: light dark;
+}
+
+.light {
+  color-scheme: light;
+}
+
+.dark {
+  color-scheme: dark;
+  --is-bg: #050505;
+  --is-surface: #1f1f1f;
+  --is-surface-alt: #2e2e2e;
+  --is-border: #4a4a4a;
+  --is-text: #f4f4f4;
+  --is-text-secondary: #d4d4d4;
+  --is-text-tertiary: #a3a3a3;
+  --is-accent: #7ba8cc;
+  --is-accent-text: #a0c3de;
+  --is-focus-ring: #7ba8cc;
+  --is-purpose: #d07050;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not(.light) {
+    --is-bg: #050505;
+    --is-surface: #1f1f1f;
+    --is-surface-alt: #2e2e2e;
+    --is-border: #4a4a4a;
+    --is-text: #f4f4f4;
+    --is-text-secondary: #d4d4d4;
+    --is-text-tertiary: #a3a3a3;
+    --is-accent: #7ba8cc;
+    --is-accent-text: #a0c3de;
+    --is-focus-ring: #7ba8cc;
+    --is-purpose: #d07050;
+  }
+}

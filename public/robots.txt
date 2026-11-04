@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://manual.ideaspaces.xyz/sitemap-index.xml

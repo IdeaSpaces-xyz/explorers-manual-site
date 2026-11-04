@@ -52,8 +52,6 @@ public wording, a new shared design pattern, and any change to this file.
 ## Still open
 
 - Whether deploys after Ship 1 go ahead on the holder's check, with the human told: the Thread's 6.1.
-- Whether the site says `ai-train=yes`. Search and agent reading are signalled; training is left unsaid
-  until the human decides.
 
 ## When to revisit
 

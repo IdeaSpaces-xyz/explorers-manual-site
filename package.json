@@ -1,0 +1,25 @@
+{
+  "name": "explorers-manual-site",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=22.23.4" },
+  "scripts": {
+    "dev": "node scripts/build.mjs --dev",
+    "build": "node scripts/build.mjs",
+    "check": "node scripts/check-dist.mjs",
+    "preview": "astro preview",
+    "astro": "astro"
+  },
+  "dependencies": {
+    "@astrojs/sitemap": "^3.7.4",
+    "astro": "^7.4.5",
+    "gray-matter": "^4.0.3",
+    "marked": "^15.0.12"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.56.0",
+    "typescript": "^5.9.0",
+    "wrangler": "^4.0.0"
+  }
+}

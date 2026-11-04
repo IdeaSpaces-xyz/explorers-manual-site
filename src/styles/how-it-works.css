@@ -1,0 +1,230 @@
+/* How it works' hero, scroll story and scene, moved from the landing's
+   HowItWorksPage.css with the same values. Two rules keep the animation honest:
+   the loop drawing never moves, and .hiw-story's align-items: stretch is
+   load-bearing, because a sticky element only travels as far as its grid item. */
+
+.hiw-page {
+  --dg-accent-wash: rgba(74, 120, 152, 0.1);
+  --dg-accent-line: rgba(74, 120, 152, 0.36);
+  --dg-rail: #c0c8d0;
+}
+
+.dark .hiw-page {
+  --dg-accent-wash: rgba(123, 168, 204, 0.15);
+  --dg-accent-line: rgba(123, 168, 204, 0.44);
+  --dg-rail: #6b7280;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not(.light) .hiw-page {
+    --dg-accent-wash: rgba(123, 168, 204, 0.15);
+    --dg-accent-line: rgba(123, 168, 204, 0.44);
+    --dg-rail: #6b7280;
+  }
+}
+
+.hiw-hero h1,
+.hiw-beat h2 {
+  margin: 0;
+  font-weight: 400;
+  text-wrap: balance;
+}
+
+.hiw-wrap,
+.hiw-wrap-wide {
+  width: 100%;
+  margin: 0 auto;
+  padding-right: 24px;
+  padding-left: 24px;
+}
+
+.hiw-wrap { max-width: 960px; }
+.hiw-wrap-wide { max-width: 1120px; }
+
+.hiw-hero { padding: 64px 24px 0; }
+.hiw-hero h1 {
+  max-width: 15ch;
+  color: var(--is-text);
+  font-size: 42px;
+  line-height: 1.02;
+  letter-spacing: -0.019em;
+}
+.hiw-hero h1 em { color: var(--is-accent); font-style: italic; }
+.hiw-hero p {
+  max-width: 720px;
+  margin-top: 32px;
+  color: var(--is-text-secondary);
+  font-size: 21px;
+  line-height: 1.5;
+}
+.hiw-hero p + p { margin-top: 20px; font-size: 19px; line-height: 1.55; }
+.hiw-hero strong,
+.hiw-beat strong { color: var(--is-text); font-weight: 400; }
+.hiw-hero p.cue {
+  margin: 56px 0 96px;
+  color: var(--is-text-secondary);
+  font-family: var(--font-chrome);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  line-height: 1.8;
+  text-transform: uppercase;
+}
+
+.hiw-story {
+  display: grid;
+  align-items: stretch;
+  grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
+  gap: 56px;
+  border-top: 1px solid var(--is-border);
+}
+.hiw-beats { padding-bottom: 12vh; }
+.hiw-act {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  margin-bottom: -4vh;
+  padding-top: 14vh;
+  font-family: var(--font-chrome);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+}
+.hiw-act .hiw-num { color: var(--is-accent); }
+.hiw-act .hiw-name { color: var(--is-text-secondary); text-transform: uppercase; }
+.hiw-act .hiw-rule { flex: 1; height: 1px; background: var(--is-border); }
+.hiw-beat {
+  display: flex;
+  min-height: 82vh;
+  flex-direction: column;
+  justify-content: center;
+  padding: 3vh 0;
+  opacity: 0.34;
+  transition: opacity 0.4s ease;
+}
+.hiw-beat.live { opacity: 1; }
+.hiw-beat h2 {
+  max-width: 18ch;
+  color: var(--is-text);
+  font-size: 32px;
+  line-height: 1.08;
+  letter-spacing: -0.019em;
+}
+.hiw-beat p {
+  max-width: 30rem;
+  margin: 24px 0 0;
+  color: var(--is-text-secondary);
+  font-size: 19px;
+  line-height: 1.55;
+}
+.hiw-beat p + p { margin-top: 16px; }
+
+.hiw-stage-col { position: relative; height: 100%; }
+.hiw-stage {
+  position: sticky;
+  top: 0;
+  display: flex;
+  height: 100vh;
+  flex-direction: column;
+  justify-content: center;
+  gap: 14px;
+  padding: 16px 0;
+}
+.hiw-stage-meta {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  color: var(--is-text-secondary);
+  font-family: var(--font-chrome);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.hiw-stage-meta .hiw-now { color: var(--is-accent); }
+.hiw-stage-frame { min-width: 0; }
+.hiw-page svg.scene { display: block; width: 100%; max-height: 74vh; height: auto; }
+.hiw-progress { display: flex; gap: 3px; }
+.hiw-progress i {
+  display: block;
+  width: 13px;
+  height: 2px;
+  border-radius: 1px;
+  background: var(--is-border);
+  transition: background 0.25s ease;
+}
+.hiw-progress i.done { background: var(--dg-rail); }
+.hiw-progress i.on { background: var(--is-accent); }
+
+/* Diagram roles. The SVG remains static markup; the scroll controller only
+   changes scene visibility and these state classes. */
+.hiw-page .s-node { fill: var(--is-text); font-family: var(--font-chrome); font-size: 15px; }
+.hiw-page .s-head { fill: var(--is-text-tertiary); font-family: var(--font-chrome); font-size: 12px; letter-spacing: 0.04em; text-transform: uppercase; }
+.hiw-page .s-item { fill: var(--is-text-secondary); font-family: var(--font-chrome); font-size: 13.5px; }
+.hiw-page .s-arrow { fill: var(--is-text-tertiary); font-family: var(--font-chrome); font-size: 11.5px; letter-spacing: 0.01em; }
+.hiw-page .s-crumb { fill: var(--is-accent); font-family: var(--font-chrome); font-size: 14px; }
+.hiw-page .s-small { fill: var(--is-text-secondary); font-family: var(--font-chrome); font-size: 12px; }
+.hiw-page .node-box { fill: var(--is-bg); stroke: var(--is-text); stroke-width: 1.4; }
+.hiw-page .dash-box { fill: none; stroke: var(--dg-rail); stroke-width: 1.3; stroke-dasharray: 5 5; }
+.hiw-page .flow { fill: none; stroke: var(--dg-rail); stroke-width: 1.5; transition: stroke 0.3s ease; }
+.hiw-page .flow.on { stroke: var(--is-accent); stroke-width: 2.4; }
+.hiw-page .flow.faint { opacity: 0.3; }
+.hiw-page .flowhead { fill: var(--dg-rail); }
+.hiw-page .flowhead.on { fill: var(--is-accent); }
+.hiw-page .node .node-box { transition: stroke 0.3s ease, stroke-width 0.3s ease; }
+.hiw-page .node.hot .node-box { stroke: var(--is-accent); stroke-width: 2.3; }
+.hiw-page .node.hot .s-node { fill: var(--is-accent-text); }
+.hiw-page .grp { transition: opacity 0.5s ease; }
+.hiw-page .panel { fill: none; stroke: var(--is-border); stroke-width: 1.3; rx: 4; }
+.hiw-page .panel.loose { stroke: var(--is-purpose); stroke-dasharray: 5 4; }
+.hiw-page .panel.pov { stroke: var(--dg-accent-line); }
+.hiw-page .bar { fill: var(--is-surface-alt); stroke: var(--is-border); stroke-width: 1; rx: 2; }
+.hiw-page .bar.pov { fill: var(--dg-accent-wash); stroke: var(--dg-accent-line); }
+.hiw-page .scatter { fill: none; stroke: var(--is-purpose); stroke-width: 1.2; rx: 2; opacity: 0.8; }
+.hiw-page .gitrail { stroke: var(--dg-rail); stroke-width: 1.3; }
+.hiw-page .gitdot { fill: var(--dg-rail); }
+.hiw-page .gitdot.on { fill: var(--is-accent); }
+.hiw-page .s-nocap { fill: var(--is-purpose); font-family: var(--font-chrome); font-size: 12.5px; }
+
+@media (min-width: 640px) {
+  .hiw-hero { padding-top: 96px; }
+  .hiw-hero h1 { font-size: 64px; }
+  .hiw-hero p { font-size: 25px; }
+  .hiw-hero p + p { font-size: 21px; }
+}
+
+@media (min-width: 900px) {
+  .hiw-beat h2 { font-size: 38px; }
+  .hiw-beat p { font-size: 20px; line-height: 1.5; }
+}
+
+@media (max-width: 900px) {
+  .hiw-story { grid-template-columns: 1fr; gap: 0; }
+  .hiw-stage-col { position: sticky; top: 0; z-index: 10; order: -1; height: auto; }
+  .hiw-stage { height: auto; border-bottom: 1px solid var(--is-border); background: var(--is-bg); padding: 12px 0 14px; }
+  .hiw-page svg.scene { max-height: 40vh; }
+  .hiw-beat { min-height: 66vh; opacity: 1; }
+  .hiw-act { padding-top: 8vh; }
+}
+
+@media (max-width: 420px) {
+  .hiw-wrap,
+  .hiw-wrap-wide { padding-right: 16px; padding-left: 16px; }
+  .hiw-hero { padding-right: 16px; padding-left: 16px; }
+  .hiw-stage-meta { gap: 8px; font-size: 10px; }
+  .hiw-progress i { width: 9px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hiw-page .grp,
+  .hiw-page .node,
+  .hiw-page .flow,
+  .hiw-beat,
+  .hiw-page .node-box,
+  .hiw-progress i { transition: none !important; }
+}
+
+/* Without JavaScript the words stand alone: no stage, every beat at full strength. */
+html:not(.js) .hiw-stage-col { display: none; }
+html:not(.js) .hiw-story { display: block; max-width: 768px; }
+html:not(.js) .hiw-beats { padding-bottom: 48px; }
+html:not(.js) .hiw-act { margin-bottom: 0; padding-top: 48px; }
+html:not(.js) .hiw-beat { min-height: 0; padding: 24px 0; opacity: 1; }

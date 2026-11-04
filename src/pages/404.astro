@@ -1,0 +1,12 @@
+---
+import Base from '../layouts/Base.astro';
+import { front } from '../lib/content';
+---
+
+<Base title={`Page not found · ${front.name}`} description="This page is not in the manual.">
+  <article class="wrap reader">
+    <h1>Page not found</h1>
+    <p>This page is not in the manual.</p>
+    <p class="actions"><a href="/">Back to {front.name} →</a></p>
+  </article>
+</Base>
