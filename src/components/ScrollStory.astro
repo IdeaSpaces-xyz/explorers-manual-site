@@ -1,0 +1,50 @@
+---
+import '../styles/how-it-works.css';
+import scene from './how-it-works/scene.svg?raw';
+import type { Story } from '../lib/content';
+
+interface Props {
+  story: Story;
+}
+
+const { story } = Astro.props;
+const first = story.beats[0];
+---
+
+<div class="hiw-wrap-wide hiw-story">
+  <div class="hiw-beats">
+    {
+      story.beats.map((beat, index) => (
+        <Fragment>
+          {beat.act !== story.beats[index - 1]?.act && (
+            <div class="hiw-act">
+              <span class="hiw-num">{beat.act.number}</span>
+              <span class="hiw-name">{beat.act.name}</span>
+              <span class="hiw-rule" />
+            </div>
+          )}
+          <section class="hiw-beat" data-beat={beat.id} data-act-number={beat.act.number} data-act-name={beat.act.name}>
+            <h2 id={beat.anchor}>{beat.title}</h2>
+            <Fragment set:html={beat.html} />
+          </section>
+        </Fragment>
+      ))
+    }
+  </div>
+
+  <div class="hiw-stage-col">
+    <div class="hiw-stage">
+      <div class="hiw-stage-meta">
+        <span><span class="hiw-now" id="actNum">{first.act.number}</span> &nbsp;·&nbsp; <span id="actName">{first.act.name}</span></span>
+        <span class="hiw-progress" aria-hidden="true">
+          {story.beats.map(() => <i />)}
+        </span>
+      </div>
+      <div class="hiw-stage-frame" set:html={scene} />
+    </div>
+  </div>
+</div>
+
+<script>
+  import '../scripts/how-it-works';
+</script>

@@ -1,0 +1,37 @@
+---
+import Base from '../layouts/Base.astro';
+import ScrollStory from '../components/ScrollStory.astro';
+import { front, nextOnPath, pages } from '../lib/content';
+
+export function getStaticPaths() {
+  return pages.filter((page) => page.route !== '/').map((page) => ({ params: { slug: page.route.slice(1) }, props: { page } }));
+}
+
+const { page } = Astro.props;
+const next = nextOnPath(page);
+---
+
+<Base title={`${page.heading} · ${front.name}`} description={page.summary} twin={page.twin}>
+  {
+    page.story ? (
+      <div class="hiw-page">
+        <section class="hiw-wrap hiw-hero" set:html={page.story.hero} />
+        <ScrollStory story={page.story} />
+        <article class="wrap reader reader-landing" set:html={page.story.rest} />
+      </div>
+    ) : (
+      <article class:list={['wrap reader', { 'reader-landing': page.landing }]} set:html={page.html} />
+    )
+  }
+  <nav class="wrap page-end" aria-label="Where next">
+    {
+      next && (
+        <a class="next" href={next.route}>
+          <span>Next on the path</span>
+          {next.name} →
+        </a>
+      )
+    }
+    <a href="/">← {front.name}</a>
+  </nav>
+</Base>

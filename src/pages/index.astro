@@ -1,0 +1,55 @@
+---
+import Base from '../layouts/Base.astro';
+import { doors, front, frontSections } from '../lib/content';
+
+const { intro, sections } = frontSections();
+const lastStep = sections.findLastIndex((section) => section.step);
+const onPath = sections.slice(0, lastStep + 1);
+const after = sections.slice(lastStep + 1);
+---
+
+<Base title={front.name} description={front.summary} twin={front.twin}>
+  <section class="wrap front-hero" set:html={intro} />
+
+  <section class="band">
+    <div class="wrap path">
+      {
+        onPath.map((section) => (
+          <section class:list={['path-step', { 'path-aside': !section.step }]} aria-labelledby={section.anchor}>
+            <span class="path-mark" aria-hidden={section.step ? undefined : 'true'}>{section.step ?? '↻'}</span>
+            <div class="path-body">
+              <h2 id={section.anchor}>{section.step ? section.title.replace(/^\d+\.\s+/, '') : section.title}</h2>
+              <Fragment set:html={section.html} />
+            </div>
+          </section>
+        ))
+      }
+    </div>
+  </section>
+
+  {
+    doors.length > 0 && (
+      <section class="wrap doors" aria-label="Ways in">
+        {
+          doors.map((page) => (
+            <a class="door" href={page.route}>
+              <span class="door-name">{page.name}</span>
+              <span class="door-summary">{page.summary}</span>
+            </a>
+          ))
+        }
+      </section>
+    )
+  }
+
+  <div class="wrap front-after">
+    {
+      after.map((section) => (
+        <section aria-labelledby={section.anchor}>
+          <h2 id={section.anchor}>{section.title}</h2>
+          <Fragment set:html={section.html} />
+        </section>
+      ))
+    }
+  </div>
+</Base>

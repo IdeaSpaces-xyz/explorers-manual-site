@@ -1,0 +1,92 @@
+---
+import '../styles/tokens.css';
+import '../styles/site.css';
+import logo from '../components/logo-symbol.svg?raw';
+import { COMMIT, front, nav } from '../lib/content';
+
+interface Props {
+  title: string;
+  description: string;
+  /** The page's Markdown twin. */
+  twin?: string;
+}
+
+const { title, description, twin } = Astro.props;
+const path = Astro.url.pathname.replace(/\.html$/, '').replace(/\/index$/, '') || '/';
+const canonical = new URL(path, Astro.site).href;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#050505" media="(prefers-color-scheme: dark)" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    {twin && <link rel="alternate" type="text/markdown" href={twin} />}
+    <link rel="sitemap" href="/sitemap-index.xml" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={front.name} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta name="twitter:card" content="summary" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fragment+Mono&family=Sorts+Mill+Goudy:ital@0;1&display=swap"
+      rel="stylesheet"
+    />
+    <script is:inline>
+      document.documentElement.classList.add('js');
+      try {
+        const theme = localStorage.getItem('manual-theme');
+        if (theme === 'light' || theme === 'dark') document.documentElement.classList.add(theme);
+      } catch {}
+    </script>
+  </head>
+  <body>
+    <a class="skip" href="#content">Skip to content</a>
+    <header class="site-header">
+      <div class="site-header-inner">
+        <a class="brand" href="/" aria-label={front.name}>
+          <Fragment set:html={logo} />
+          <span class="wordmark" aria-hidden="true"><span>idea</span><span>spaces</span></span>
+        </a>
+        <button class="theme" type="button" hidden>System</button>
+        <nav aria-label="Manual">
+          <a href="/" aria-current={path === '/' ? 'page' : undefined}>Manual</a>
+          {
+            nav.map((page) => (
+              <a href={page.route} aria-current={path === page.route ? 'page' : undefined}>
+                {page.nav}
+              </a>
+            ))
+          }
+        </nav>
+      </div>
+    </header>
+    <main id="content" tabindex="-1">
+      <slot />
+    </main>
+    <footer class="site-footer">
+      <div class="site-footer-inner">
+        <nav aria-label="Footer">
+          <a href="/">Manual</a>
+          {nav.map((page) => <a href={page.route}>{page.nav}</a>)}
+          {twin && <a href={twin}>This page as Markdown</a>}
+          <a href="/llms.txt">llms.txt</a>
+          <a href="https://ideaspaces.xyz">ideaspaces.xyz ↗</a>
+        </nav>
+        <p>Manual at {COMMIT.slice(0, 7)}</p>
+      </div>
+    </footer>
+    <script>
+      import '../scripts/theme';
+    </script>
+  </body>
+</html>

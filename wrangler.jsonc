@@ -1,0 +1,13 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "explorers-manual-site",
+  "compatibility_date": "2026-11-04",
+  "assets": {
+    "directory": "./dist",
+    "html_handling": "auto-trailing-slash",
+    "not_found_handling": "404-page"
+  },
+  // No routes and no workers.dev: `wrangler deploy` alone cannot claim a hostname.
+  // Attaching manual.ideaspaces.xyz is the human's step, in DEPLOY.md.
+  "workers_dev": false
+}
