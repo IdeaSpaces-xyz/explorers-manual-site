@@ -4,3 +4,13 @@ scratch/
 _local/
 # Local-only material — yours, on this machine. Never synced or shared.
 *.local.md
+
+# build
+node_modules/
+dist/
+.astro/
+.source/
+.wrangler/
+.env*
+test-results/
+.DS_Store
