@@ -44,8 +44,8 @@ pin. `/llms.txt` lists them all.
 `/updates` is the manual's updates Thread, `_threads/updates/`, read from Git at the pin. Only `kind: post`
 reaches readers, and `src/lib/updates.mjs` builds the tree from `in_reply_to`. Each post has a page, a `.md`
 twin and a place in `/rss.xml`; `/updates.md` and `llms.txt` list them with dates, so an agent can answer
-"what changed since this date?". A pin without the Thread simply has no timeline. The look is plain until
-a direction is chosen.
+"what changed since this date?". A pin without the Thread simply has no timeline. The look is direction A, the
+line, chosen by the human from Visuals' study; `src/styles/timeline.css` holds it.
 
 ## How it works' story
 

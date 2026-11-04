@@ -258,6 +258,8 @@ export interface MapLink {
   href: string;
   name: string;
   summary: string;
+  /** Leaves the manual, or is a file rather than a page. */
+  external: boolean;
 }
 
 export interface Update extends Omit<UpdatePost, 'map' | 'parents'> {
@@ -272,10 +274,10 @@ const SITE = 'https://manual.ideaspaces.xyz';
 /** A post's Map, as links: a manual page by its route, anything else by its address. */
 function mapLinks(post: UpdatePost): MapLink[] {
   return post.map.map((member) => {
-    if ('address' in member) return { href: member.address, name: member.name, summary: member.summary };
+    if ('address' in member) return { href: member.address, name: member.name, summary: member.summary, external: true };
     const page = pages.find((candidate) => candidate.path === member.position);
     if (!page) throw new Error(`${post.file}: its Map names ${member.position}, which is not published`);
-    return { href: `${SITE}${page.route === '/' ? '' : page.route}`, name: page.name, summary: member.summary };
+    return { href: page.route, name: page.name, summary: member.summary, external: false };
   });
 }
 
@@ -299,3 +301,32 @@ export const opening = thread ? toUpdate(thread.opening) : null;
 export const updates: Update[] = thread
   ? thread.posts.filter((post) => post !== thread.opening).map(toUpdate).reverse()
   : [];
+
+export interface LineStory {
+  post: Update;
+  /** Every later post that follows from this one, oldest first. */
+  followUps: Update[];
+}
+
+/** The post a story hangs from: walk up the tree until the next parent is the opening. */
+function storyRoot(post: Update): Update {
+  let current = post;
+  for (;;) {
+    const parent = current.parents.find((candidate) => candidate.id !== opening!.id);
+    const next = parent && updates.find((candidate) => candidate.id === parent.id);
+    if (!next) return current;
+    current = next;
+  }
+}
+
+/** The line: one entry per story, newest activity first, each follow-up kept with its story. */
+export const stories: LineStory[] = updates
+  .filter((post) => storyRoot(post) === post)
+  .map((post) => ({
+    post,
+    followUps: updates.filter((candidate) => candidate !== post && storyRoot(candidate) === post).reverse(),
+  }))
+  .sort((a, b) => {
+    const latest = (story: LineStory) => Math.max(story.post.date.getTime(), ...story.followUps.map((post) => post.date.getTime()));
+    return latest(b) - latest(a);
+  });

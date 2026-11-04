@@ -1,0 +1,344 @@
+/* Direction A, the line, chosen by the human 2026-11-04. Ported from Visuals' study,
+   code/visuals/spikes/manual-timeline, with the same values. */
+
+/* What the three directions share. Site tokens only, so light and dark come with them. */
+
+:root {
+  /* The line is the thing being shown, so it has to read: 3:1 or better on the page in both themes. */
+  --t-rail: var(--is-text-tertiary);
+  --t-wash: color-mix(in srgb, var(--is-accent) 12%, transparent);
+}
+
+/* The page's head: the Thread's own name and summary. */
+
+.t-head {
+  padding-top: 56px;
+  padding-bottom: 48px;
+}
+
+.t-head > * { max-width: 720px; }
+
+.t-head h1 {
+  margin: 0;
+  color: var(--is-text);
+  font-size: 42px;
+  font-weight: 400;
+  letter-spacing: -0.019em;
+  line-height: 1.04;
+}
+
+.t-head p {
+  margin: 24px 0 0;
+  color: var(--is-text-secondary);
+  font-size: 21px;
+  line-height: 1.5;
+}
+
+.t-head .t-feeds {
+  display: flex;
+  gap: 0 20px;
+  margin-top: 12px;
+  font-family: var(--font-chrome);
+  font-size: 12px;
+  letter-spacing: 0.01em;
+}
+
+.t-feeds a {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  color: var(--is-text-secondary);
+}
+
+/* One post's words. */
+
+.t-date {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0 10px;
+  margin: 0;
+  color: var(--is-text-secondary);
+  font-family: var(--font-chrome);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  line-height: 1.5;
+  text-transform: uppercase;
+}
+
+.a-post h2, .a-post h3 {
+  margin: 8px 0 0;
+  color: var(--is-text);
+  font-weight: 400;
+  letter-spacing: -0.015em;
+  text-wrap: balance;
+}
+
+.a-post h2 { font-size: 30px; line-height: 1.12; }
+.a-post h3 { font-size: 24px; line-height: 1.18; }
+
+.a-post :is(h2, h3) a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.a-post :is(h2, h3) a:hover {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+}
+
+/* What changed, as pages. */
+
+.t-map { margin-top: 20px; }
+
+.t-map-label {
+  margin: 0 0 4px;
+  color: var(--is-text-secondary);
+  font-family: var(--font-chrome);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.t-map ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.t-map li { border-top: 1px solid var(--is-border); }
+.t-map li:last-child { border-bottom: 1px solid var(--is-border); }
+
+.t-map a {
+  display: grid;
+  min-height: 44px;
+  align-content: center;
+  grid-template-columns: minmax(0, 1fr);
+  padding: 8px 0;
+  text-decoration: none;
+}
+
+.t-page {
+  color: var(--is-accent-text);
+  font-size: 20px;
+  line-height: 1.25;
+}
+
+.t-why {
+  color: var(--is-text-secondary);
+  font-size: 17px;
+  line-height: 1.35;
+}
+
+.t-map a:hover .t-page { color: var(--is-text); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 4px; }
+
+/* What changed, as names. Direction A. */
+
+.t-links { margin-top: 12px; }
+
+.t-links ul {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 0;
+  padding: 0;
+  gap: 0 20px;
+  list-style: none;
+}
+
+.t-links a {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  font-size: 19px;
+}
+
+/* A post's own page. */
+
+.t-post .t-back {
+  margin: 0 0 24px;
+  font-family: var(--font-chrome);
+  font-size: 12px;
+  letter-spacing: 0.01em;
+}
+
+.t-post .t-back a {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  color: var(--is-text-secondary);
+}
+
+.t-post .t-date { font-size: 12px; line-height: 1.5; margin: 0 0 12px; font-family: var(--font-chrome); }
+
+.t-post .c-follows { margin-top: 8px; font-family: var(--font-chrome); font-size: 12px; letter-spacing: 0.01em; }
+
+.t-post .t-map { margin-top: 40px; }
+
+@media (min-width: 640px) {
+  .t-head { padding-top: 80px; padding-bottom: 64px; }
+  .t-head h1 { font-size: 56px; }
+  .t-head p { font-size: 23px; }
+  .a-post h2 { font-size: 34px; }
+  .t-map a { align-items: baseline; gap: 16px; grid-template-columns: 11em minmax(0, 1fr); }
+  .t-map .t-page { font-size: 19px; }
+  .wrap.t-head-a { padding-left: calc(24px + 116px + 32px); }
+}
+
+@media (max-width: 420px) {
+  .t-head { padding-top: 40px; padding-bottom: 36px; }
+}
+
+/* A, the line. It extends the front page's .path: a hairline, a mark on it, words beside it.
+   --x is where the line runs; a date sits left of it once there is room. */
+
+.a-line {
+  --x: 5px;
+  --in: 30px;
+  --step: 28px;
+  margin: 0;
+  padding: 0 0 72px;
+  list-style: none;
+}
+
+.a-story,
+.a-origin {
+  position: relative;
+  padding-left: calc(var(--x) + var(--in));
+}
+
+.a-story { padding-bottom: 64px; }
+
+.a-story::before {
+  position: absolute;
+  top: 6px;
+  bottom: -6px;
+  left: var(--x);
+  width: 1px;
+  background: var(--t-rail);
+  content: '';
+}
+
+.a-story::after,
+.a-origin::after {
+  position: absolute;
+  top: 3px;
+  left: calc(var(--x) - 5px);
+  width: 11px;
+  height: 11px;
+  border: 1px solid var(--is-accent);
+  border-radius: 50%;
+  background: var(--is-bg);
+  content: '';
+}
+
+.a-newest::after { background: var(--is-accent); }
+
+.a-origin::after {
+  border-color: var(--t-rail);
+  border-style: dashed;
+}
+
+.a-origin-text {
+  margin: 6px 0 0;
+  color: var(--is-text-secondary);
+  font-size: 18px;
+}
+
+.a-post p.a-summary {
+  margin: 12px 0 0;
+  color: var(--is-text-secondary);
+  font-size: 20px;
+  line-height: 1.45;
+}
+
+.a-post p.a-more {
+  margin: 2px 0 0;
+  font-family: var(--font-chrome);
+  font-size: 12px;
+  letter-spacing: 0.01em;
+}
+
+.a-more a {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  color: var(--is-text-secondary);
+}
+
+/* A branch: the line turns off the main rail and runs down beside the follow-ups. */
+
+.a-branch {
+  position: relative;
+  margin: 40px 0 0;
+  padding: 0 0 0 var(--step);
+  list-style: none;
+}
+
+/* The turn. */
+.a-branch > li:first-child::before {
+  position: absolute;
+  top: -18px;
+  left: calc((var(--in) + var(--step)) * -1);
+  width: var(--in);
+  height: 24px;
+  border-top: 1px solid var(--t-rail);
+  border-right: 1px solid var(--t-rail);
+  border-top-right-radius: 12px;
+  content: '';
+}
+
+.a-branch > li {
+  position: relative;
+  padding-bottom: 32px;
+}
+
+.a-branch > li:last-child { padding-bottom: 0; }
+
+/* The branch's own line, then its mark. */
+.a-branch > li:not(:last-child)::after {
+  position: absolute;
+  top: 6px;
+  bottom: -6px;
+  left: calc(var(--step) * -1);
+  width: 1px;
+  background: var(--t-rail);
+  content: '';
+}
+
+.a-branch .a-post::before {
+  position: absolute;
+  top: 5px;
+  left: calc(var(--step) * -1 - 3px);
+  z-index: 1;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--t-rail);
+  content: '';
+}
+
+@media (min-width: 640px) {
+  .a-line {
+    --x: 116px;
+    --in: 32px;
+    max-width: 880px;
+  }
+
+  .a-post, .a-origin { position: static; }
+
+  .a-story > .a-post > .t-date,
+  .a-origin > .t-date {
+    position: absolute;
+    top: 1px;
+    left: 0;
+    display: block;
+    width: calc(var(--x) - 20px);
+    text-align: right;
+  }
+
+  .a-story > .a-post > h2 { margin-top: -5px; }
+
+  .a-origin-text { margin-top: -3px; }
+
+  .a-branch .a-post { position: relative; }
+}

@@ -7,12 +7,13 @@ export function getStaticPaths() {
   return opening ? [{ params: { feed: 'rss' } }] : [];
 }
 
+const SITE = 'https://manual.ideaspaces.xyz';
 const escapeHtml = (text: string) => text.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;');
 
 function content(post: Update) {
   if (post.map.length === 0) return post.html;
   const links = post.map
-    .map((link) => `<li><a href="${escapeHtml(link.href)}">${escapeHtml(link.name)}</a>${link.summary ? `: ${escapeHtml(link.summary)}` : ''}</li>`)
+    .map((link) => `<li><a href="${escapeHtml(link.href.startsWith('/') ? SITE + link.href : link.href)}">${escapeHtml(link.name)}</a>${link.summary ? `: ${escapeHtml(link.summary)}` : ''}</li>`)
     .join('');
   return `${post.html}<h2>What changed, read more here</h2><ul>${links}</ul>`;
 }

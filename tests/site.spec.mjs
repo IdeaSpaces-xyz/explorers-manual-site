@@ -112,14 +112,31 @@ test.describe('the timeline', () => {
   test('every post opens from the timeline and says what changed', async ({ page, request }) => {
     const feed = items(await (await request.get('/rss.xml')).text());
     await page.goto('/updates');
-    await expect(page.locator('.timeline > li')).toHaveCount(feed.length);
+    await expect(page.locator('.a-post')).toHaveCount(feed.length);
     for (const item of feed) {
       const path = new URL(item.link).pathname;
       await page.goto('/updates');
-      await page.locator(`.timeline a[href="${path}"]`).first().click();
+      await page.locator(`.a-post a[href="${path}"]`).first().click();
       await expect(page).toHaveURL(new RegExp(`${path}$`));
-      await expect(page.getByRole('heading', { name: 'What changed, read more here' })).toBeVisible();
-      await expect(page.locator('.changed a').first()).toBeVisible();
+      await expect(page.getByText('What changed, read more here')).toBeVisible();
+      await expect(page.locator('.t-map a').first()).toBeVisible();
+    }
+  });
+
+  test('a follow-up stays with its story on the line', async ({ page }) => {
+    await page.goto('/updates');
+    const stories = page.locator('.a-story');
+    await expect(stories.first()).toHaveClass(/a-newest/);
+    expect(await stories.count()).toBeLessThan(await page.locator('.a-post').count());
+    await expect(page.locator('.a-branch .a-post').first()).toBeVisible();
+    await expect(page.locator('.a-origin')).toBeVisible();
+  });
+
+  test('RSS and As Markdown are real', async ({ page, request }) => {
+    await page.goto('/updates');
+    for (const name of ['RSS', 'As Markdown']) {
+      const href = await page.locator('.t-feeds').getByRole('link', { name }).getAttribute('href');
+      expect((await request.get(href)).ok(), href).toBe(true);
     }
   });
 
