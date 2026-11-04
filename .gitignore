@@ -1,0 +1,6 @@
+# ideaspace defaults
+*.draft.md
+scratch/
+_local/
+# Local-only material — yours, on this machine. Never synced or shared.
+*.local.md
