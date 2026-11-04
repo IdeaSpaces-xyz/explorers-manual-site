@@ -196,7 +196,7 @@ function load(entry: (typeof PAGES)[number]): Page {
     group: entry.group,
     door: entry.door,
     nav: entry.nav,
-    landing: Boolean(entry.door),
+    landing: Boolean(entry.landing),
     name: String(data.name),
     summary: String(data.summary),
     heading: heading.replace(/[*_`]/g, '').replace(/[.]$/, ''),

@@ -6,15 +6,17 @@
 //   door   the front page shows it as a way in, in this order
 //   nav    its label in the header
 //   story  the page carries How it works' scroll story
+//   landing  came from the landing: keeps its label-over-title sections
 
 export const FRONT = 'README.md';
 
 export const PAGES = [
   { path: 'README.md', group: 'start' },
 
-  { path: 'how-it-works.md', group: 'page', door: 1, nav: 'How it works', story: true },
-  { path: 'integrations.md', group: 'page', door: 2, nav: 'Integrations' },
-  { path: 'developers.md', group: 'developers', door: 3, nav: 'Developers' },
+  { path: 'why.md', group: 'page', door: 1, nav: 'Why' },
+  { path: 'how-it-works.md', group: 'page', door: 2, nav: 'How it works', story: true, landing: true },
+  { path: 'integrations.md', group: 'page', door: 3, nav: 'Integrations', landing: true },
+  { path: 'developers.md', group: 'developers', door: 4, nav: 'Developers', landing: true },
 
   { path: 'guides/prepare-your-machine.md', group: 'guides' },
   { path: 'guides/open-this-manual-with-an-agent.md', group: 'guides' },

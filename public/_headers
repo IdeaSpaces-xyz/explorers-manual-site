@@ -1,6 +1,6 @@
 /*
   X-Content-Type-Options: nosniff
-  Content-Signal: search=yes, ai-input=yes
+  Content-Signal: search=yes, ai-input=yes, ai-train=yes
 
 /*.html
   Content-Type: text/html; charset=utf-8
