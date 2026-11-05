@@ -1,11 +1,16 @@
 import { existsSync } from 'node:fs';
 import { expect, test } from '@playwright/test';
 import { BEATS } from '../src/lib/story.mjs';
-import { PAGES, routeOf } from '../src/lib/pages.mjs';
+import { PAGES, SECTIONS, routeOf } from '../src/lib/pages.mjs';
 
 // The timeline exists only when the build's pin holds the updates Thread.
 const hasTimeline = existsSync('dist/rss.xml');
-const routes = [...PAGES.map((page) => routeOf(page.path)), '/not-a-page', ...(hasTimeline ? ['/updates'] : [])];
+const routes = [
+  ...PAGES.map((page) => routeOf(page.path)),
+  ...Object.keys(SECTIONS).map((folder) => `/${folder}`),
+  '/not-a-page',
+  ...(hasTimeline ? ['/updates'] : []),
+];
 
 for (const [width, height, label] of [[1280, 800, 'wide'], [390, 844, 'phone']]) {
   test(`How it works walks every beat with real scrolling, ${label}`, async ({ page }) => {
@@ -68,6 +73,85 @@ test('a guide says what comes next on the path', async ({ page }) => {
   await page.goto('/guides/prepare-your-machine');
   await page.locator('.next').click();
   await expect(page).toHaveURL(/open-this-manual-with-an-agent/);
+});
+
+test('a trimmed URL lists its folder, as a page and as Markdown', async ({ page, request }) => {
+  for (const [folder, label] of Object.entries(SECTIONS)) {
+    await page.goto(`/${folder}`);
+    await expect(page.getByRole('heading', { level: 1, name: label })).toBeVisible();
+    const notes = PAGES.filter((entry) => entry.path.startsWith(`${folder}/`));
+    await expect(page.locator('.section-list a')).toHaveCount(notes.length);
+    const twin = await request.get(`/${folder}.md`);
+    expect(twin.ok()).toBe(true);
+    for (const note of notes) expect(await twin.text()).toContain(`/${note.path}`);
+  }
+});
+
+test('llms-full.txt holds every page, in reading order, each with its address', async ({ request }) => {
+  const full = await (await request.get('/llms-full.txt')).text();
+  const urls = [...full.matchAll(/^url: (.+)$/gm)].map((match) => new URL(match[1]).pathname);
+  for (const entry of PAGES) expect(urls).toContain(routeOf(entry.path));
+  expect(urls[0]).toBe('/for-agents');
+  expect(urls.indexOf('/')).toBeLessThan(urls.indexOf('/guides/prepare-your-machine'));
+  expect(urls.indexOf('/guides/prepare-your-machine')).toBeLessThan(urls.indexOf('/guides/reflect-on-your-work'));
+  expect(urls.indexOf('/guides/reflect-on-your-work')).toBeLessThan(urls.indexOf('/developers'));
+  expect((await request.get('/llms.txt')).ok()).toBe(true);
+  expect(await (await request.get('/llms.txt')).text()).toContain('/llms-full.txt');
+});
+
+test.describe('Markdown by the Accept header', () => {
+  const MARKDOWN = 'text/markdown';
+  const BROWSER = 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8';
+  const post = hasTimeline ? ['/updates/2026-11-04-the-manual-has-a-home-of-its-own'] : [];
+
+  for (const path of ['/', '/how-it-works', '/guides', ...post]) {
+    test(`${path} answers each Accept with its own form`, async ({ request }) => {
+      const twin = await request.get(path === '/' ? '/index.md' : `${path}.md`);
+      const asMarkdown = await request.get(path, { headers: { Accept: MARKDOWN } });
+      expect(asMarkdown.status()).toBe(200);
+      expect(asMarkdown.headers()['content-type']).toContain('text/markdown');
+      expect(asMarkdown.headers().vary).toContain('Accept');
+      expect(await asMarkdown.text()).toBe(await twin.text());
+
+      for (const accept of [BROWSER, 'text/markdown, text/html', '*/*', 'application/json']) {
+        const asPage = await request.get(path, { headers: { Accept: accept } });
+        expect(asPage.status(), accept).toBe(200);
+        expect(asPage.headers()['content-type'], accept).toContain('text/html');
+        expect(asPage.headers().vary, accept).toContain('Accept');
+      }
+    });
+  }
+
+  test('static headers survive the Worker', async ({ request }) => {
+    for (const accept of [MARKDOWN, BROWSER]) {
+      const response = await request.get('/how-it-works', { headers: { Accept: accept } });
+      expect(response.headers()['content-signal']).toContain('ai-train=yes');
+      expect(response.headers()['x-content-type-options']).toBe('nosniff');
+    }
+  });
+
+  for (const accept of [MARKDOWN, BROWSER]) {
+    test(`closed and missing paths stay 404 under ${accept.slice(0, 13)}`, async ({ request }) => {
+      for (const path of ['/not-a-page', '/_agent/agreement', '/_agent/agreement.md', '/_threads/updates/README', '/CLAUDE']) {
+        const response = await request.get(path, { headers: { Accept: accept } });
+        expect(response.status(), path).toBe(404);
+      }
+    });
+
+    test(`files are the same under ${accept.slice(0, 13)}`, async ({ request }) => {
+      for (const [path, type] of [['/llms.txt', 'text/plain'], ['/how-it-works.md', 'text/markdown'], ['/favicon.svg', 'image/svg+xml']]) {
+        const response = await request.get(path, { headers: { Accept: accept } });
+        expect(response.status(), path).toBe(200);
+        expect(response.headers()['content-type'], path).toContain(type);
+        expect(response.headers().vary ?? '', path).not.toContain('Accept');
+      }
+    });
+  }
+
+  test('a browser still gets the page', async ({ page }) => {
+    await page.goto('/how-it-works');
+    await expect(page.locator('.hiw-story')).toBeVisible();
+  });
 });
 
 test('old anchors from the landing still land on their sections', async ({ page }) => {

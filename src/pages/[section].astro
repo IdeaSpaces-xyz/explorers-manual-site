@@ -1,0 +1,33 @@
+---
+import Base from '../layouts/Base.astro';
+import { front, inFolder } from '../lib/content';
+import { SECTIONS } from '../lib/pages.mjs';
+
+// A URL trimmed back to its folder lists what is in it, rather than a 404.
+export function getStaticPaths() {
+  return Object.entries(SECTIONS).map(([section, label]) => ({ params: { section }, props: { label } }));
+}
+
+const { section } = Astro.params;
+const { label } = Astro.props;
+const notes = inFolder(section);
+---
+
+<Base title={`${label} · ${front.name}`} description={`${label} in ${front.name}.`} twin={`/${section}.md`}>
+  <article class="wrap reader">
+    <h1>{label}</h1>
+    <ul class="section-list">
+      {
+        notes.map((page) => (
+          <li>
+            <a href={page.route}>{page.name}</a>
+            <span>{page.summary}</span>
+          </li>
+        ))
+      }
+    </ul>
+  </article>
+  <nav class="wrap page-end" aria-label="Where next">
+    <a href="/">← {front.name}</a>
+  </nav>
+</Base>

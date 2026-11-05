@@ -12,7 +12,8 @@ first release's; a new hostname is still the human's.
 After attaching a new hostname, a resolver that was asked first may cache "no such name" for up to half an
 hour. Check `dig <host> @1.1.1.1` before calling a deploy broken.
 
-`wrangler.jsonc` serves `dist/` as Worker static assets, with `workers_dev: false`. Astro's canonical host is
+`wrangler.jsonc` serves `dist/` as Worker static assets, with `workers_dev: false`. Since 2026-11-05
+a thin Worker, `worker/index.ts`, sits in front of pages to answer `Accept: text/markdown`. Astro's canonical host is
 `https://manual.ideaspaces.xyz`. No beacon or analytics is included.
 
 ## Before a release
@@ -52,13 +53,15 @@ Read-only probes, if authorized: `dig manual.ideaspaces.xyz`, `curl -I https://m
 base=https://manual.ideaspaces.xyz
 for path in / /index.md /README.md /how-it-works /how-it-works.md /integrations /developers \
   /guides/prepare-your-machine /guides/prepare-your-machine.md /explore/notes /reference/language \
-  /updates /updates.md /rss.xml /llms.txt /robots.txt /sitemap-index.xml /favicon.svg; do
+  /updates /updates.md /rss.xml /llms.txt /llms-full.txt /guides /guides.md /explore /for-agents /robots.txt /sitemap-index.xml /favicon.svg; do
   curl -sS -o /dev/null -w '%{http_code} %{content_type} %{url_effective}\n' "$base$path"
 done
 curl -sS -o /dev/null -w '%{http_code} %{url_effective}\n' "$base/_agent/agreement.md"   # 404
 curl -sS -o /dev/null -w '%{http_code} %{url_effective}\n' "$base/CLAUDE.md"             # 404
 curl -sS -o /dev/null -w '%{http_code} %{url_effective}\n' "$base/updates/README.md"     # 404
-curl -sSI "$base/" | grep -i 'content-signal\|content-type'
+curl -sSI "$base/" | grep -i 'content-signal\|content-type\|vary'
+curl -sS -H 'Accept: text/markdown' -o /dev/null -w '%{http_code} %{content_type}\n' "$base/how-it-works"   # text/markdown
+curl -sS -H 'Accept: text/markdown' -o /dev/null -w '%{http_code}\n' "$base/_agent/agreement"               # 404
 ```
 
 Expect 200 and the right type, then walk it in a browser: How it works' eight beats, both themes, a

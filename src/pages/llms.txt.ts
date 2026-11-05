@@ -1,7 +1,13 @@
 import type { APIRoute } from 'astro';
-import { COMMIT, front, inGroup, opening, updates, updatesRoute, type Page } from '../lib/content';
+import matter from 'gray-matter';
+import { COMMIT, SITE, detached, front, inGroup, opening, pages, updates, updatesRoute, type Page } from '../lib/content';
+import { FOR_AGENTS } from '../lib/pages.mjs';
+import { llmsFull } from '../lib/llms-full';
 
-const SITE = 'https://manual.ideaspaces.xyz';
+const agents = pages.find((page) => page.path === FOR_AGENTS)!;
+const opener = detached(matter(agents.raw).content, agents.path);
+const heading = /^# .+$/m.exec(opener)![0];
+const kb = Math.round(Buffer.byteLength(llmsFull()) / 1024);
 const entry = (page: Page) => `- [${page.name}](${SITE}${page.twin}): ${page.summary}`;
 const section = (title: string, group: string) => {
   const pages = inGroup(group);
@@ -22,14 +28,17 @@ const timeline = opening
 export const GET: APIRoute = () =>
   new Response(
     [
-      `# ${front.name}`,
+      heading,
       '',
-      `> ${front.summary}`,
+      `> ${agents.summary}`,
       '',
-      `Every page here has a Markdown twin: add .md to its address. Built from the manual at commit ${COMMIT}.`,
+      opener.replace(heading, '').trim(),
+      '',
+      `Every page here has a Markdown twin: add .md to its address. All of it in one file: ${SITE}/llms-full.txt (${kb} KB). Built from the manual at commit ${COMMIT}.`,
       '',
       '## Start here',
       '',
+      entry(agents),
       entry(front),
       ...inGroup('page').map(entry),
       '',

@@ -7,9 +7,13 @@
 
 /*.md
   Content-Type: text/markdown; charset=utf-8
+  Link: <https://manual.ideaspaces.xyz/llms.txt>; rel="index", <https://manual.ideaspaces.xyz/llms-full.txt>; rel="alternate"; type="text/plain"
 
 /rss.xml
   Content-Type: application/rss+xml; charset=utf-8
 
 /llms.txt
+  Content-Type: text/plain; charset=utf-8
+
+/llms-full.txt
   Content-Type: text/plain; charset=utf-8

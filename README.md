@@ -37,7 +37,8 @@ To publish a new manual commit, change `manual.pin` and rebuild. To publish anot
 `src/lib/pages.mjs`. Both are reviewed changes here.
 
 `/explore/notes` is the page and `/explore/notes.md` its twin: the Note exactly as it stands at the
-pin. `/llms.txt` lists them all.
+pin. `/explore` lists its folder. `/llms.txt` opens with the manual's `for-agents.md` and lists them all;
+`/llms-full.txt` holds every page in reading order, with comments gone and links made full addresses.
 
 ## The timeline
 
@@ -46,6 +47,14 @@ reaches readers, and `src/lib/updates.mjs` builds the tree from `in_reply_to`. E
 twin and a place in `/rss.xml`; `/updates.md` and `llms.txt` list them with dates, so an agent can answer
 "what changed since this date?". A pin without the Thread simply has no timeline. The look is direction A, the
 line, chosen by the human from Visuals' study; `src/styles/timeline.css` holds it.
+
+## Markdown at the normal address
+
+`worker/index.ts` is a thin Worker in front of the static files. When `Accept` prefers `text/markdown`, a
+page answers with its twin; otherwise it answers as usual, and both carry `Vary: Accept`. A browser names
+`text/html`, so it never gets Markdown. The rule is the client's `prefersMarkdown`. `.md`, `.txt`, `.xml` and
+built assets never reach the Worker, and a 404 is the same under either header. `npm run preview` has no
+Worker: use `npx wrangler dev --local` to try it.
 
 ## How it works' story
 
