@@ -10,7 +10,11 @@
 
 export const FRONT = 'README.md';
 
+// The Note llms.txt opens with, word for word, so no copy lives in this repo.
+export const FOR_AGENTS = 'for-agents.md';
+
 export const PAGES = [
+  { path: FOR_AGENTS, group: 'agents' },
   { path: 'README.md', group: 'start' },
 
   { path: 'why.md', group: 'page', door: 1, nav: 'Why' },
@@ -37,6 +41,12 @@ export const PAGES = [
 
   { path: 'reference/language.md', group: 'reference' },
 ];
+
+// Folders a reader can trim a URL back to: each lists its Notes.
+export const SECTIONS = { guides: 'Guides', explore: 'Explore', reference: 'Reference' };
+
+// The order of llms-full.txt, by group.
+export const READING_ORDER = ['agents', 'start', 'page', 'guides', 'explore', 'reference', 'developers'];
 
 // The one Thread that is public: its posts, read from Git at the pin. Only the
 // files directly in this folder: its README and _agent/ stay closed, and so does

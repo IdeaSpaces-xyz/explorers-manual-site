@@ -2,10 +2,14 @@
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "explorers-manual-site",
   "compatibility_date": "2026-11-04",
+  // Only for pages: it chooses Markdown or HTML by the Accept header.
+  "main": "worker/index.ts",
   "assets": {
     "directory": "./dist",
+    "binding": "ASSETS",
     "html_handling": "auto-trailing-slash",
-    "not_found_handling": "404-page"
+    "not_found_handling": "404-page",
+    "run_worker_first": ["/*", "!/*.md", "!/*.txt", "!/*.xml", "!/*.svg", "!/_astro/*"]
   },
   // Attached on the human's word, 2026-11-04.
   "routes": [{ "pattern": "manual.ideaspaces.xyz", "custom_domain": true, "zone_name": "ideaspaces.xyz" }],

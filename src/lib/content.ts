@@ -55,6 +55,8 @@ export interface Page {
   story: Story | null;
 }
 
+export const SITE = 'https://manual.ideaspaces.xyz';
+
 const BY_PATH = new Map<string, (typeof PAGES)[number]>(PAGES.map((page) => [page.path, page]));
 const escapeHtml = (text: string) =>
   text.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;');
@@ -76,6 +78,33 @@ function makeSlugger() {
     seen.set(base, count + 1);
     return count === 0 ? base : `${base}-${count}`;
   };
+}
+
+/**
+ * A Note's Markdown for a file read away from its folder: comments gone, and every
+ * link a full address. Code blocks stay exactly as they are.
+ */
+export function detached(markdown: string, from: string): string {
+  const absolute = (href: string) => {
+    if (/^[a-z][a-z0-9+.-]*:/i.test(href)) return href;
+    if (href.startsWith('#')) return `${SITE}${routeOf(from)}${href}`;
+    resolveHref(href, from);
+    const [target, anchor] = href.split('#');
+    const resolved = path.posix.normalize(path.posix.join(path.posix.dirname(from), target));
+    return `${SITE}/${resolved}${anchor ? `#${anchor}` : ''}`;
+  };
+  return markdown
+    .split(/(^```[\s\S]*?^```[ \t]*$)/m)
+    .map((part, index) =>
+      index % 2 === 1
+        ? part
+        : part
+            .replace(/^[ \t]*<!--[\s\S]*?-->[ \t]*\n?/gm, '')
+            .replace(/\]\(([^)\s]+)(\s+"[^"]*")?\)/g, (_, href, title = '') => `](${absolute(href)}${title})`),
+    )
+    .join('')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
 }
 
 /** A link in a Note, as the site serves it. Refuses one that lands on nothing published. */
@@ -216,6 +245,7 @@ export const front = pages.find((page) => page.path === FRONT)!;
 export const doors = pages.filter((page) => page.door !== undefined).sort((a, b) => a.door! - b.door!);
 export const nav = pages.filter((page) => page.nav);
 export const inGroup = (group: string) => pages.filter((page) => page.group === group);
+export const inFolder = (folder: string) => pages.filter((page) => page.path.startsWith(`${folder}/`));
 
 /** The front page: the README cut at its ## headings, with the numbered ones as the path. */
 export function frontSections(): { intro: string; sections: Section[] } {
@@ -268,8 +298,6 @@ export interface Update extends Omit<UpdatePost, 'map' | 'parents'> {
   parents: UpdatePost[];
   replies: UpdatePost[];
 }
-
-const SITE = 'https://manual.ideaspaces.xyz';
 
 /** A post's Map, as links: a manual page by its route, anything else by its address. */
 function mapLinks(post: UpdatePost): MapLink[] {

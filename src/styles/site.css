@@ -580,6 +580,29 @@ figure.code code {
   font-size: 28px;
 }
 
+/* A folder's list. */
+
+.section-list {
+  padding: 0;
+  list-style: none;
+}
+
+.reader .section-list li {
+  margin-top: 20px;
+}
+
+.section-list a {
+  display: inline-block;
+  padding: 4px 0;
+}
+
+.section-list span {
+  display: block;
+  color: var(--is-text-secondary);
+  font-size: 18px;
+  line-height: 1.4;
+}
+
 /* The end of a page: where the person goes next. */
 
 .page-end {

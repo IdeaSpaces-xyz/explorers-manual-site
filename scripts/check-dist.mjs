@@ -7,7 +7,7 @@ import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { dirname, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { PAGES, UPDATES_ROUTE, routeOf, twinOf, isNeverPublished } from '../src/lib/pages.mjs';
+import { PAGES, SECTIONS, UPDATES_ROUTE, routeOf, twinOf, isNeverPublished } from '../src/lib/pages.mjs';
 import { loadUpdates } from '../src/lib/updates.mjs';
 
 const site = resolve(dirname(fileURLToPath(import.meta.url)), '..');
@@ -36,6 +36,13 @@ for (const { path } of PAGES) {
   }
   const note = execFileSync('git', ['-C', root, 'show', `${pin}:${path}`], { encoding: 'utf8' });
   if (readFileSync(join(dist, twin), 'utf8') !== note) problems.push(`twin differs from the Note: ${twin}`);
+}
+
+for (const folder of Object.keys(SECTIONS)) {
+  twins.add(`/${folder}.md`);
+  for (const file of [`/${folder}.html`, `/${folder}.md`]) {
+    if (!fileSet.has(file)) problems.push(`no ${file}`);
+  }
 }
 
 const thread = loadUpdates(process.env.MANUAL_SOURCE ?? join(site, '.source'));
@@ -106,6 +113,21 @@ else {
     if (!llms.includes(post.twin)) problems.push(`llms.txt does not list ${post.twin}`);
   }
 }
+let fullSize = '';
+if (!fileSet.has('/llms-full.txt')) problems.push('no llms-full.txt');
+else {
+  const full = readFileSync(join(dist, 'llms-full.txt'), 'utf8');
+  for (const { path } of PAGES) {
+    const url = `https://manual.ideaspaces.xyz${routeOf(path) === '/' ? '/' : routeOf(path)}\n`;
+    if (!full.includes(`url: ${url}`)) problems.push(`llms-full.txt does not hold ${path}`);
+  }
+  for (const post of posts) {
+    if (!full.includes(`url: https://manual.ideaspaces.xyz${post.route}\n`)) problems.push(`llms-full.txt does not hold ${post.file}`);
+  }
+  if (/\]\((?!https?:|mailto:)/.test(full.replace(/^```[\s\S]*?^```/gm, ''))) problems.push('llms-full.txt has a relative link');
+  if (/<!--/.test(full.replace(/^```[\s\S]*?^```/gm, ''))) problems.push('llms-full.txt carries a comment');
+  fullSize = `, llms-full.txt ${Buffer.byteLength(full)} bytes, about ${Math.round(full.length / 4)} tokens`;
+}
 if (!fileSet.has('/404.html')) problems.push('no 404 page');
 
 if (problems.length > 0) {
@@ -113,4 +135,4 @@ if (problems.length > 0) {
   for (const problem of problems) console.error(`  ${problem}`);
   process.exit(1);
 }
-console.log(`dist/ holds: ${PAGES.length} pages, ${posts.length} updates, ${twins.size} Markdown files, ${links} internal links all landing, manual ${pin.slice(0, 7)}`);
+console.log(`dist/ holds: ${PAGES.length} pages, ${posts.length} updates, ${twins.size} Markdown files, ${links} internal links all landing, manual ${pin.slice(0, 7)}${fullSize}`);
