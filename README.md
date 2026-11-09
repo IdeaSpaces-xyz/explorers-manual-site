@@ -80,6 +80,7 @@ never moves, because the eye only sees what moved if nothing else did.
 
 ```sh
 npm run build                 # includes scripts/check-dist.mjs
+npm run test:guard            # a never-published folder is refused at build start and in dist/
 npx playwright test           # walks the built site in Chromium and WebKit
 ```
 

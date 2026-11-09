@@ -56,7 +56,7 @@ export const UPDATES_ROUTE = '/updates';
 export const MANUAL_ROOT_ID = 'n_ba793faed9389f32f7f59828';
 
 // Refused twice: here at build start, and again in the finished dist/.
-export const NEVER_PUBLISHED = ['_agent', '.pi', '_threads', '_local'];
+export const NEVER_PUBLISHED = ['_agent', '.pi', '_threads', '_local', '_drafts'];
 
 // Sections that kept their words but changed their address when the landing's
 // pages became Notes. An old link such as /integrations#claude must still land.
